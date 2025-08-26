@@ -1,0 +1,240 @@
+/* ============= Themes.css ============== */
+/* Styling for overall page layout, font, and background */
+/* ===== Theme variables fallback if NO theme class is present ===== */
+.theme-gallery {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+}
+
+.theme-card {
+    border: 2px solid #ccc;
+    padding: 1rem;
+    width: 200px;
+    border-radius: 10px;
+    background-color: #f7f7f7;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.theme-card.locked {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+:root {
+    --bg-color: #ffffff;
+    --text-color: rgb(3, 3, 82);
+    --accent-color: #87ceeb;
+    /* default blue */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color) !important;
+}
+
+.button,
+.popup {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+/* Themes */
+.theme-blue {
+    --bg-color: #aad7f6;
+    --text-color: #0d47a1;
+    --accent-color: #42a5f5;
+}
+
+.theme-green {
+    --bg-color: #b9dbbc;
+    --text-color: #1b5e20;
+    --accent-color: #3d4c3e;
+}
+
+.theme-pink {
+    --bg-color: #ebbad6;
+    --text-color: #880e4f;
+    --accent-color: #f06292;
+}
+
+.theme-gallery {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+}
+
+.theme-card {
+    border: 2px solid #ccc;
+    padding: 1rem;
+    width: 200px;
+    border-radius: 10px;
+    background-color: #f7f7f7;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.theme-card.locked {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.theme-original {
+    --bg-color: #ffffff;
+    --text-color: purple;
+    --accent-color: #6095aa;
+}
+
+.theme-pinklight {
+    --bg-color: #e59fb6;
+    --text-color: #880e4f;
+    --accent-color: #650626;
+}
+
+.theme-purple {
+    --bg-color: #3e3578;
+    /* SlateBlue – soft purple-blue blend */
+    --text-color: #9987cc;
+    /* Deep indigo, warm and readable */
+    --accent-color: #e697e4;
+    /* Lavender blush – gentle and feminine */
+}
+
+.theme-greenmed {
+    --bg-color: #6fca8c;
+    --text-color: #004d40;
+    --accent-color: #263c3a;
+}
+
+.theme-pinkmed {
+    --bg-color: #e03fa8;
+    /* rich berry-pink backdrop */
+    --text-color: #621547;
+    /* soft pastel pink for contrast */
+    --accent-color: #280c16;
+    /* bold raspberry pink for buttons */
+}
+
+.theme-darkblue {
+    --bg-color: #1e2a38;
+    /* deep navy */
+    --text-color: #3f8cb5;
+    /* soft white */
+    --accent-color: #3f51b5;
+    /* indigo */
+}
+
+.theme-darkgreen {
+    --bg-color: #1c611c;
+    /* earthy dark green */
+    --text-color: #43a043;
+    /* light pastel green */
+    --accent-color: #c9f0cb;
+    /* medium green */
+}
+
+.theme-darkrose {
+    --bg-color: #7e1b35;
+    /* deep romantic rose */
+    --text-color: #ea95b1;
+    /* soft light rose */
+    --accent-color: #ebbbce;
+    /* vibrant lipstick pink */
+}
+
+.theme-bingo {
+    --bg-color: #e6f640;
+    --text-color: #767931;
+    --accent-color: #0a0a0a;
+}
+
+.theme-bumblebee {
+    --bg-color: #d0c65d;
+    --text-color: #3e3e3e;
+    --accent-color: #282722;
+}
+
+.theme-dolphin {
+    --bg-color: #1e557d;
+    /* deep ocean blue */
+    --text-color: #cc6ca0;
+    /* soft, warm pink – still readable */
+    --accent-color: #d2dce4;
+    /* playful dolphin splash blue */
+}
+
+.theme-bubby-bear {
+    --bg-color: #6e4f34;
+    /* warm, soft teddy brown */
+    --text-color: #f9e8d9;
+    /* creamy vanilla */
+    --accent-color: #4fa74f;
+    /* honey caramel highlight */
+}
+
+.theme-shortcake {
+    --bg-color: #fddde6;
+    /* soft strawberry milk pink */
+    --text-color: #a84863;
+    /* berry rose */
+    --accent-color: #741151;
+    /* frosted pink topping */
+}
+
+/* ------- TESTING (original .theme-moonlight reverted to .theme-moonlight { ------ */
+.theme-moonlight {
+    --bg-color: #082042;
+    /* midnight sky */
+    --text-color: #64a4e4;
+    /* pale moon */
+    --accent-color: #9dcfff;
+    /* shimmering accent */
+}
+
+.theme-arcade {
+    --bg-color: #2e0505;
+    /* dark arcade background */
+    --text-color: #c14242;
+    /* neon red-pink glow */
+    --accent-color: #ff3131;
+    /* bold joystick red */
+}
+
+.theme-peach {
+    --bg-color: #F9C5A0;
+    /* warm peachy background */
+    --text-color: #5A3E36;
+    /* cocoa brown for beautiful contrast */
+    --accent-color: #3b311d;
+    /* soft peachy cream for highlights */
+}
+
+.theme-brady {
+    --bg-color: #B0C4DE;
+    --text-color: #2F4F4F;
+    --accent-color: #244159;
+}
+
+/* --------------------------Theme Customization ------------------ */
+.top-journal-section,
+.gradient-section-box,
+.bottom-wrapper,
+.full-journal-box {
+    background: var(--bg-color);
+    /* or a themed gradient if you're fancy */
+    color: var(--text-color);
+}
+
+.theme-colored-text {
+    color: var(--text-color) !important;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+h2 {
+    background-color: var(--bg-color);
+    color: var(--text-color) !important;
+}

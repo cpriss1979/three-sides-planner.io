@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<script src="sw-register.js"></script>
+
+<script>
+  (function () {
+    try {
+      var r = document.documentElement;
+      var t = localStorage.getItem("themeClass")
+        || localStorage.getItem("themeClass:last")
+        || "theme-original";
+      (r.className.match(/\btheme-[^\s]+/g) || []).forEach(c => r.classList.remove(c));
+      r.classList.add(t);
+    } catch { }
+  })();
+</script>
+  
+<head>
+  <meta charset="UTF-8" />
+  <title>Badge Wall</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="manifest" href="manifest.webmanifest?v=8">
+
+  <!-- Theme support (optional) -->
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="script.js"></script>
+
+  <!-- 🌈 CSS Styling -->
+  <style>
+    /* Keep hidden until auth resolves */
+html[data-ready="false"] { visibility: hidden; }
+
+/* Fix unlocked highlight (your old selector wouldn't trigger) */
+.badge.unlocked img { filter: none; opacity: 1; }
+
+        body {
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: #fef9ff;
+    }
+
+    h1 {
+      text-align: center;
+      color: #b04bb3;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .badge-wall {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1rem;
+    }
+  
+    .badge {
+      text-align: center;
+      width: 100px;
+    }
+  
+    .badge img {
+      width: 80px;
+      height: 80px;
+      filter: grayscale(100%) opacity(50%);
+      transition: all 0.3s ease-in-out;
+    }
+  
+    .badges.unlocked img {
+      filter: none;
+      opacity: 1;
+    }
+
+.badge span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+    </style>
+
+
+<!-- 🔖 Badge Wall HTML Structure -->
+<div class="badge-wall">
+  <div class="badge" data-badge="login">
+    <img src="badges/login.png" alt="First Login Badge">
+    <span>First Login</span>
+  </div>
+
+  <div class="badge" data-badge="feelgood1">
+    <img src="badges/feelgood1.png" alt="First Feel-Good Idea">
+    <span>1 Feel-Good Idea</span>
+  </div>
+
+  <div class="badge" data-badge="feelgood5">
+    <img src="badges/feelgood5.png" alt="5 Feel-Good Ideas">
+    <span>5 Feel-Good Ideas</span>
+  </div>
+
+  <!-- Add more badges as needed -->
+</div>
+
+<!-- 🧠 JavaScript Badge Logic -->
+<script type="module">
+  import { auth, db } from "./firebase-init.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    arrayUnion,
+    onSnapshot,
+    enableIndexedDbPersistence
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // If you want the visibility guard without editing <html>,
+  // add this one liner here instead:
+  // document.documentElement.setAttribute("data-ready", "false");
+  const docEl = document.documentElement;
+  const wall = document.getElementById("badgeWall");
+
+  // Optional offline cache; safe to ignore multi-tab error
+  try { await enableIndexedDbPersistence(db); } catch { }
+
+  function renderBadges(earned = []) {
+    const ids = new Set(earned);
+    wall.querySelectorAll(".badge").forEach(el => {
+      const id = el.dataset.badge;
+      if (ids.has(id)) el.classList.add("unlocked");
+      else el.classList.remove("unlocked");
+    });
+  }
+
+  async function unlockBadge(userRef, badgeId) {
+    try {
+      await updateDoc(userRef, { badges: arrayUnion(badgeId) });
+    } catch {
+      // Doc might not exist yet — create + merge
+      await setDoc(userRef, { badges: [badgeId] }, { merge: true });
+    }
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      location.replace("login.html?next=badge.html");
+      return;
+    }
+
+    const userRef = doc(db, "users", user.uid);
+
+    // Ensure the doc exists so onSnapshot has data to read
+    try {
+      const snap = await getDoc(userRef);
+      if (!snap.exists()) {
+        await setDoc(userRef, { badges: [] }, { merge: true });
+      }
+    } catch { }
+
+    // Live updates: reflect badges earned elsewhere immediately
+    onSnapshot(userRef, (snap) => {
+      const data = snap.data() || {};
+      const earned = Array.isArray(data.badges) ? data.badges : [];
+      renderBadges(earned);
+    });
+
+    // Optional helpers for other pages:
+    window.unlockBadge = (id) => unlockBadge(userRef, id);
+    window.celebrateBadge = async (id, message = "Badge earned!") => {
+      await unlockBadge(userRef, id);
+      alert(`🏅 ${message}`);
+    };
+
+    // Reveal now that auth is resolved
+    docEl.setAttribute("data-ready", "true");
+
+    // If you want to guarantee awarding "First Login" once:
+    // await unlockBadge(userRef, "login");
+  });
+</script>
+
+</body>
+
+</html>

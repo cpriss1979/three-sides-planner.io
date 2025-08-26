@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <script src="sw-register.js"></script>
+
+  <title>Theme Shop</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- 🔒 Require auth -->
+  <link rel="stylesheet" href="mainTheme.css">
+  <link rel="manifest" href="manifest.webmanifest?v=8">
+
+  <style>
+    html {
+      visibility: hidden
+    }
+  </style>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .theme-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 2rem;
+      padding: 1rem;
+      /* ← This adds mobile padding */
+      max-width: 1000px;
+      margin: auto;
+      box-sizing: border-box;
+    }
+
+    .theme-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      /* 2 per row */
+      gap: 0.5rem;
+      /* tight spacing between cards */
+      padding: 0;
+      width: 100vw;
+      /* force full viewport width */
+      box-sizing: border-box;
+    }
+
+    .theme-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      padding: 0 0.5rem;
+      /* ← this adds space ONLY to the left/right */
+      width: 100vw;
+      box-sizing: border-box;
+    }
+
+    .theme-card {
+      height: 420px;
+      /* ← Bigger vertical space */
+      background: rgb(250, 230, 250) !important;
+      border-radius: 1.5rem;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      font-size: 1.8rem !important;
+      /* ← Bigger text */
+      line-height: 5;
+      box-sizing: border-box;
+      transition: transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+      max-width: unset;
+      /* ← remove max-width limit */
+      padding: 2.5rem;
+      border-bottom: 2px solid #eee;
+    }
+
+    .theme-card:hover {
+      transform: scale(1.03);
+    }
+
+    .theme-card h3 {
+      font-size: 2.5rem;
+      color: #444;
+    }
+
+    .theme-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.5rem;
+      padding: 0 3rem;
+      /* ← keep this one */
+      width: 100vw;
+      box-sizing: border-box;
+    }
+
+    .theme-card button {
+      background-color: #b04bb3;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.4rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .theme-card button:hover {
+      background-color: #983d9d;
+    }
+
+    /* 📱 Mobile View */
+    @media (max-width: 600px) {
+      .theme-gallery {
+        grid-template-columns: 1fr;
+      }
+
+      .theme-card {
+        height: auto;
+        /* Let it shrink naturally */
+        padding: 1.5rem;
+        font-size: 1.3rem;
+      }
+
+      .theme-card h3 {
+        font-size: 1.4rem;
+      }
+
+      .theme-card button {
+        font-size: 1.2rem;
+        padding: 0.8rem 1.5rem;
+      }
+    }
+
+    .theme-size {
+      font-size: 35px;
+    }
+
+    /* -------------------- Back to App ---------------- */
+    .backToApp {
+      display: inline-block;
+      margin: 8rem auto;
+      padding: 20px 40px;
+      background-color: #000 !important;
+      /* Black background */
+      color: #fff !important;
+      /* White text */
+      font-size: 1.8rem;
+      /* Cleaned and corrected */
+      font-weight: 1000;
+      border: 2px solid white;
+      border-radius: 16px;
+      /* exaggerate the curve */
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      /* Soft white-ish glow */
+      transition: background-color 0.3s, transform 0.2s;
+      text-align: center;
+    }
+
+    .backToApp:hover {
+      background-color: #222 !important;
+      /* Darker hover */
+      color: #fff !important;
+      transform: scale(1.03);
+    }
+
+    .backToApp:active {
+      transform: scale(0.98);
+    }
+
+    /* ---------------- Affermations -------------- */
+    .affirmation-popup {
+      position: fixed;
+      bottom: 85%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ffeef8;
+      color: #4a004e;
+      padding: 1.5rem 2rem;
+      /* ⬅️ more padding helps text breathe */
+      font-size: 2.6rem;
+      font-weight: bold;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      max-width: 90vw;
+      /* ⬅️ slightly wider for safer wrapping */
+      width: max-content;
+      /* ⬅️ works better than fit-content for wrapped text */
+      min-width: 250px;
+      /* ⬅️ prevents weird shrinking on short affirmations */
+      word-wrap: break-word;
+      /* ⬅️ forces long words to wrap */
+      white-space: normal;
+      text-align: center;
+      line-height: 1.5;
+      z-index: 9999;
+      transition: opacity 1s ease;
+      opacity: 1;
+    }
+
+    .theme-page .wrap {
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    /* -------------------- NAV ICON CONSISTENCY -------------------- */
+
+    /* ----------------- override styles ------------*/
+    /* List layout */
+    .toolkit-list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    /* Default card look (works on light backgrounds) */
+    .idea-item {
+      position: relative;
+      padding: .6rem 2.2rem .6rem .9rem;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, .06);
+      border: 1px solid rgba(0, 0, 0, .12);
+    }
+
+    /* When inside your dark “dreamy” section, use lighter translucent card */
+    .dreamy-box .idea-item {
+      background: rgba(255, 255, 255, .14);
+      border-color: rgba(255, 255, 255, .26);
+      color: #fff;
+      /* stay readable on dark bg */
+    }
+
+    /* Delete button */
+    .idea-item .idea-del {
+      position: absolute;
+      right: .4rem;
+      top: .4rem;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    /* Feel-good dropdown show/hide */
+    .feel-good-content {
+      display: none;
+    }
+
+    .feel-good-content.open {
+      display: block;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="theme-size">
+    <h1>🎨 Theme Shop</h1>
+    <div id="authControls" style="text-align:center; margin-top:1rem;"></div>
+  </div>
+  <div class="theme-gallery">
+    <!-- Yellow -->
+    <div class="theme-card">
+      <h3>Bingo Yellow</h3><button onclick="setTheme('bingo')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Bumblebee Yellow</h3><button onclick="setTheme('bumblebee')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Stella Peach</h3><button onclick="setTheme('peach')">Apply</button>
+    </div>
+
+    <!-- Red -->
+    <div class="theme-card">
+      <h3>Santafe Red</h3><button onclick="setTheme('arcade')">Apply</button>
+    </div>
+
+    <!-- Blues -->
+    <div class="theme-card">
+      <h3>Dolphin Blue</h3><button onclick="setTheme('dolphin')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Moonlight Blue</h3><button onclick="setTheme('moonlight')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Brady Blue</h3><button onclick="setTheme('brady')">Apply</button>
+    </div>
+
+    <!-- Greens -->
+    <div class="theme-card">
+      <h3>JR Green</h3><button onclick="setTheme('green')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Monkey Green</h3><button onclick="setTheme('greenmed')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Golf Green</h3><button onclick="setTheme('darkgreen')">Apply</button>
+    </div>
+
+    <!-- Pinks & Roses -->
+    <div class="theme-card">
+      <h3>Strawberry Pink</h3><button onclick="setTheme('pinklight')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Shortcake Pink</h3><button onclick="setTheme('shortcake')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Prissy Pink</h3><button onclick="setTheme('pinkmed')">Apply</button>
+    </div>
+    <div class="theme-card">
+      <h3>Date Rose</h3><button onclick="setTheme('darkrose')">Apply</button>
+    </div>
+
+    <!-- Purples -->
+    <div class="theme-card">
+      <h3>Starburst Purple</h3><button onclick="setTheme('purple')">Apply</button>
+    </div>
+
+    <!-- Brown -->
+    <div class="theme-card">
+      <h3>Bubby-Bear Brown</h3><button onclick="setTheme('bubby-bear')">Apply</button>
+    </div>
+
+    <!-- Original -->
+    <div class="theme-card">
+      <h3>Original Theme</h3><button onclick="setTheme('original')">Reset</button>
+    </div>
+  </div>
+
+  <a href="index.html" class="backToApp">← Back</a>
+  <p onclick="location.href='about.html'"
+    style="padding-bottom: 6rem; font-size: 40px; cursor: pointer; color: var(--accent-color); text-decoration: underline; font-weight: bold;">
+    Each theme is inspired by someone I love.
+  </p>
+
+  <script type="module">
+    import { auth, db } from "./firebase-init.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const show = () => { document.documentElement.style.visibility = "visible"; };
+    const slug = k => String(k).trim().toLowerCase().replace(/\s+/g, "-");
+
+    function applyThemeClass(themeClass) {
+      const root = document.documentElement;
+      const next = themeClass || "theme-original";
+      // keep any non theme-* classes, swap only the theme class
+      const keep = (root.className || "")
+        .split(/\s+/).filter(Boolean)
+        .filter(c => !c.startsWith("theme-"));
+      root.className = [...keep, next].join(" ");
+    }
+
+    // Save and preview
+    async function saveTheme(themeKey) {
+      const u = auth.currentUser;
+      if (!u) {
+        location.replace("login.html?next=theme.html");
+        return;
+      }
+      const cls = `theme-${slug(themeKey)}`;
+      await setDoc(doc(db, "users", u.uid), { themeClass: cls }, { merge: true });
+      applyThemeClass(cls); // live preview now
+    }
+
+    // Keep old onclicks working
+    window.setTheme = saveTheme;
+    window.saveTheme = saveTheme;
+
+    // Subscribe to the saved theme so this page always matches the user preference
+    let unsub = null;
+    onAuthStateChanged(auth, (u) => {
+      // cleanup any previous listener
+      unsub?.(); unsub = null;
+
+      if (!u) {
+        location.replace("login.html?next=theme.html");
+        return; // keep page hidden until redirected
+      }
+
+      let first = true;
+      unsub = onSnapshot(
+        doc(db, "users", u.uid),
+        (snap) => {
+          const cls = snap.exists() ? (snap.data().themeClass || "theme-original") : "theme-original";
+          applyThemeClass(cls);
+          if (first) { show(); first = false; }
+        },
+        (err) => {
+          console.error("[theme] snapshot error:", err);
+          applyThemeClass("theme-original");
+          show();
+        }
+      );
+    });
+  </script>
+
+</body>
+
+</html>

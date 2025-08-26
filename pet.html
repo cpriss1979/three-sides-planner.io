@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  
+  <script src="sw-register.js"></script>
+
+  <script>
+    (function () {
+      try {
+        var r = document.documentElement;
+        var t = localStorage.getItem("themeClass")
+          || localStorage.getItem("themeClass:last")
+          || "theme-original";
+        (r.className.match(/\btheme-[^\s]+/g) || []).forEach(c => r.classList.remove(c));
+        r.classList.add(t);
+      } catch { }
+    })();
+  </script>
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.webmanifest?v=8">
+
+  <title>My Pet 🌾</title>
+  <style>
+    html {
+      visibility: hidden
+    }
+  </style>
+  <noscript>
+    <style>
+      html {
+        visibility: visible
+      }
+    </style>
+  </noscript>
+
+  <style>
+    /* -------------------- PET PAGE STYLE (UPDATED) -------------------- */
+    .pet-container {
+      color: white;
+      background: rgb(3, 3, 82);
+      padding: 2rem;
+      max-width: 100%;
+      margin: 0 auto;
+      box-shadow: none;
+      border-radius: 0;
+      border-top: none;
+      border-bottom: none;
+      overflow: hidden;
+    }
+
+    .three-d-title {
+      font-size: 2.5rem;
+      font-family: 'Patrick Hand', cursive;
+      text-align: center;
+      margin-bottom: 2rem;
+      color: white;
+      letter-spacing: 1.5px;
+      font-weight: bold;
+    }
+
+    button {
+      font-family: 'Georgia', serif;
+      font-size: 1.2rem;
+      margin: 2.5rem;
+      padding: 0.75rem 1.2rem;
+      border: .5px solid yellow;
+      border-radius: 1rem;
+      background-color: #00080a;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover:not(:disabled) {
+      background-color: rgb(73, 64, 64);
+      transform: scale(1.05);
+    }
+
+    button:disabled {
+      background: #ccc !important;
+      color: #666 !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    #petImage {
+      width: 200px;
+      margin-bottom: 1.5rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    /* ------------ pet wrapper for background for pet image ----------- */
+    .pet-wrapper {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      margin: 0 auto;
+      background-image: url("forest.png");
+      background-size: cover;
+      background-position: center;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .thankMsg {
+      display: none;
+      font-style: italic;
+      color: #a3aab0;
+      margin-top: 0.5rem;
+    }
+
+    #badgeContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .badge {
+      width: 100px;
+      height: 90px;
+      border-radius: 3rem;
+      background: #d1f5c0dd;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: #444;
+      transition: transform 0.2s ease;
+      border: 5px solid rgb(211, 211, 49);
+    }
+
+    .badge:hover {
+      transform: scale(1.05);
+    }
+
+    .badge.locked {
+      opacity: 0.4;
+      filter: grayscale(100%);
+    }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 1.2rem;
+      color: black;
+      padding: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .pet-container {
+        padding: 1.2rem;
+      }
+
+      .three-d-title {
+        font-size: 2rem;
+      }
+
+      button {
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+      }
+
+      .badge {
+        width: 70px;
+        height: 70px;
+        font-size: 1rem;
+      }
+    }
+
+    .torn-paper-divider {
+  width: 100%;
+  height: 60px;
+  background: url("data:image/svg+xml;utf8,%3Csvg viewBox='0 0 1440 150' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%232a922a' stroke='%23ffffff' stroke-width='3' d='M0,40 Q80,90 160,40 T320,40 T480,40 T640,40 T800,40 T960,40 T1120,40 T1280,40 T1440,40 L1440,0 L0,0 Z'/%3E%3C/svg%3E") no-repeat center;
+  background-size: cover;
+  margin: 0;
+  padding: 0;
+  transform: rotate(180deg);
+}
+
+    /* -------------------- COMPONENTS -------------------- */
+    /* Layout Containers */
+    .journal-container,
+    .mood-section,
+    .cloud-section,
+    .page-wrapper {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0rem 2.2rem;
+      box-sizing: border-box;
+    }
+
+    .info-row {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0;
+      /* Restore index.html layout */
+      box-sizing: border-box;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .wellness-wrapper {
+      margin-top: 1rem;
+    }
+
+    .container,
+    .wellness-wrapper,
+    .gradient-section-box {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .dropdown-section {
+      width: 90%;
+      max-width: 320px;
+      margin: 2rem auto;
+      text-align: left;
+    }
+
+    .page-wrapper {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      margin-top: 0rem;
+      /* or try 0 if you want it right at the top */
+    }
+
+    .touching-sections,
+    .cloud-section,
+    .mood-section {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #fafafa;
+      border-top: 1px solid rgba(69, 111, 179, 0.903);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.8rem 0;
+      z-index: 1000;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-icon {
+      text-decoration: none;
+      color: rgba(69, 111, 179, 0.903);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.2rem;
+    }
+
+    .nav-icon span {
+      font-size: 0.75rem;
+      margin-top: 0.2rem;
+    }
+
+    .nav-icon:hover {
+      color: #72aadf;
+    }
+
+    /* Support List Items */
+    .support-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(40, 150, 180, 0.557);
+      padding: .2rem;
+      border-radius: 1rem;
+      border-left: 8px solid goldenrod;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Updated CSS with consistent nav-icon styles across pages */
+
+    /* -------------------- BASE PAGE LAYOUT -------------------- */
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      color: rgb(40, 130, 180);
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 6rem;
+      box-sizing: border-box;
+      font-family: 'Open Sans', sans-serif;
+      color: var(--text-color);
+      overflow-x: hidden;
+    }
+
+    body {
+      background-color: rgb(3, 3, 82) !important;
+      color: white;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      font-family: 'Open Sans', sans-serif;
+      text-align: center;
+      padding-bottom: 6rem;
+      overflow-x: hidden;
+    }
+
+    /* -------------------- NAV ICON CONSISTENCY -------------------- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #fafafa;
+      border-top: 1px solid rgba(69, 111, 179, 0.903);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.8rem 0;
+      z-index: 1000;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-icon {
+      text-decoration: none;
+      color: rgba(69, 111, 179, 0.903);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-icon span {
+      font-size: 0.75rem;
+      margin-top: 0.2rem;
+      color: rgba(69, 111, 179, 0.903);
+    }
+
+    .nav-icon:hover,
+    .nav-icon:focus {
+      color: #72aadf;
+      outline: none;
+    }
+
+    /* Ensure pet.html uses same nav-icon class structure */
+    a.nav-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: rgba(69, 111, 179, 0.903);
+      font-size: 1.3rem;
+      transition: color 0.3s ease;
+    }
+
+    a.nav-icon span {
+      font-size: 0.75rem;
+      margin-top: 0.2rem;
+      color: rgba(69, 111, 179, 0.903);
+    }
+
+    a.nav-icon:hover,
+    a.nav-icon:focus {
+      color: #72aadf;
+      outline: none;
+    }
+
+    /* --------------------------Theme Customization ------------------ */
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --accent-color: #87ceeb;
+      /* default blue */
+    }
+
+    .button,
+    .popup {
+      background-color: var(--accent-color);
+      color: var(--text-color);
+    }
+
+    .theme-gallery {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1rem;
+    }
+
+    .theme-card {
+      border: 2px solid #ccc;
+      padding: 1rem;
+      width: 200px;
+      border-radius: 10px;
+      background-color: #f7f7f7;
+      text-align: center;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .theme-card.locked {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .theme-original {
+      --bg-color: #ffffff;
+      --text-color: #333333;
+      --accent-color: #87ceeb;
+    }
+
+    .theme-pinklight {
+      --bg-color: #e59fb6;
+      --text-color: #880e4f;
+      --accent-color: #f48fb1;
+    }
+
+    .theme-purple {
+      --bg-color: #a836b9;
+      --text-color: #4a148c;
+      --accent-color: #ce93d8;
+    }
+
+    .theme-greenmed {
+      --bg-color: #6fca8c;
+      --text-color: #004d40;
+      --accent-color: #26a69a;
+    }
+
+    .theme-pinkmed {
+      --bg-color: #e03fa8;
+      /* rich berry-pink backdrop */
+      --text-color: #e03fa8;
+      /* soft pastel pink for contrast */
+      --accent-color: #d81b60;
+      /* bold raspberry pink for buttons */
+    }
+
+    .theme-darkblue {
+      --bg-color: #1e2a38;
+      /* deep navy */
+      --text-color: #1e2a38;
+      /* soft white */
+      --accent-color: #3f51b5;
+      /* indigo */
+    }
+
+    .theme-darkgreen {
+      --bg-color: #1c611c;
+      /* earthy dark green */
+      --text-color: #1c611c;
+      /* light pastel green */
+      --accent-color: #81c784;
+      /* medium green */
+    }
+
+    .theme-darkrose {
+      --bg-color: #4b0e1e;
+      /* deep romantic rose */
+      --text-color: #4b0e1e;
+      /* soft light rose */
+      --accent-color: #c2185b;
+      /* vibrant lipstick pink */
+    }
+
+    .theme-blue {
+      --bg-color: #aad7f6;
+      --text-color: #0d47a1;
+      --accent-color: #42a5f5;
+    }
+
+    .theme-green {
+      --bg-color: #b9dbbc;
+      --text-color: #1b5e20;
+      --accent-color: #66bb6a;
+    }
+
+    .top-journal-section,
+    .gradient-section-box,
+    .bottom-wrapper,
+    .full-journal-box {
+      background: var(--bg-color);
+      /* or a themed gradient if you're fancy */
+      color: var(--text-color);
+    }
+
+    .theme-colored-text {
+      color: var(--text-color) !important;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    #authControls {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    #authControls p {
+      margin: 0;
+      padding: 0;
+    }
+
+    .page-header {
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    body {
+      margin-top: 0;
+    }
+
+    .button-black {
+      display: inline-block;
+      padding: 10px 20px !important;
+      background-color: black !important;
+      color: #fff !important;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 1px solid white;
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      transition: background-color 0.3s, transform 0.2s;
+      text-align: center;
+    }
+
+    .button-black:hover {
+      background-color: #222 !important;
+      transform: scale(1.03) !important;
+    }
+
+    .button-black:active {
+      transform: scale(0.98) !important;
+    }
+
+    /* Sparkles */
+    .full-page-sparkle-wrapper {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999; /* above pet-container (z-index:1) */
+}
+
+.sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, rgba(255, 255, 255, .8) 0%, transparent 70%);
+      border-radius: 50%;
+      opacity: 0;
+      animation: sparkle-twinkle 4s infinite ease-in-out;
+      box-shadow: 0 0 6px rgba(255, 255, 255, .5);
+    }
+
+    @keyframes sparkle-twinkle {
+
+      0%,
+      100% {
+        opacity: .1;
+        transform: scale(.6);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.4);
+      }
+    }
+
+    .white-button {
+      background-color: #eae748;
+      color: black;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0.6rem 1.2rem;
+      border: 2px solid white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 0.5rem;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.15);
+      transition: background-color 0.2s, color 0.2s, transform 0.2s;
+    }
+
+    .white-button:hover {
+      background-color: rgb(176, 176, 74) !important;
+      transform: scale(1.04);
+    }
+
+    @media (max-width: 600px) {
+      .pet-action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    .white-button:disabled {
+      background-color: #ccc !important;
+      color: #444 !important;
+      opacity: 1 !important;
+      /* ← override the shrinking effect */
+      border: 2px solid #999;
+    }
+
+    .white-button:disabled {
+      background-color: #eae748;
+      color: black;
+      opacity: 0.8;
+      border: 2px solid white;
+    }
+
+    .white-button {
+      display: inline-block;
+      width: 160px;
+      /* match your widest */
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .white-button {
+        width: 100%;
+        max-width: 160px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0 1rem;
+        box-sizing: border-box;
+      }
+    }
+
+    h1 {
+      color: rgb(42, 146, 42);
+      /* Your pretty green */
+      text-shadow:
+        -.25px -.25px 0 #fff,
+        .25px -.25px 0 #fff,
+        -.25px .25px 0 #fff,
+        .25px .25px 0 #fff;
+    }
+
+    /* ------------------ pet.html adds & overrides ----------------- */
+    .badge-grid{
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(92px,1fr));
+      gap:16px; justify-items:center; width:100%;
+    }
+    .badge-card{
+      width:96px; aspect-ratio:1; border-radius:22px;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(70% 70% at 30% 30%, #6ee7ff 0%, #2dd4bf 40%, #0ea5e9 100%);
+      border:3px solid rgba(255,255,255,.7);
+      box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 22px rgba(255,255,255,.25);
+      color:#061320; font-size:38px; transition: transform .15s ease, filter .2s ease;
+    }
+    .badge-card:hover{ transform: translateY(-2px) scale(1.04); }
+    .badge-card.locked{
+      filter: grayscale(1) opacity(.55);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02));
+      border-color: rgba(255,255,255,.35);
+    }
+    .badge-label{
+      margin-top:.45rem; font-size:.85rem; color:#fff; opacity:.95; text-align:center; max-width:120px;
+    }
+    @media (min-width:480px){
+  .badge-card{ width:112px; font-size:44px; }
+  .badge-label{ font-size:.9rem; }
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="full-page-sparkle-wrapper" id="sparkleWrapper"></div>
+  <div class="pet-container">
+    <h1>🌟 Care for Your </h1>
+    <h1>Pet Friend 🌟</h1>
+  
+    <div class="pet-wrapper">
+      <img id="petImage" src="pet-baby.png" alt="Your Pet" />
+    </div>
+  
+    <p id="petMessage">Hi, I'm your wellness buddy! Let's grow together 🌱</p>
+  
+    <div class="section" id="journalSection">
+      <h3>Journal To Feed Your Pet</h3>
+      <a href="journal.html" onclick="setJournalClicked()">
+        <button id="journalBtn" class="white-button">📝 Go Journal</button>
+      </a>
+      <button id="feedPetBtn" class="white-button" disabled>🍽️ Feed Pet</button>
+      <p id="feedMsg" class="thankMsg">Thanks for journaling today, your mind thanks you! 🐾</p>
+    </div>
+  
+    <div class="section">
+      <h3>Did you drink water today?</h3>
+      <button id="waterYesBtn" class="white-button" onclick="waterPet()">✅ Yes</button>
+      <button id="waterNoBtn" class="white-button" onclick="alert('You deserve kindness 💖')">❌ No</button>
+      <p id="waterMsg" class="thankMsg">Thanks for drinking water today, your body thanks you!</p>
+    </div>
+  
+    <div class="section">
+      <h3>Did you do something kind for yourself today?</h3>
+      <div class="button-row">
+        <button id="bathYesBtn" class="white-button" onclick="bathePet()">✅ Yes</button>
+        <button id="bathNoBtn" class="white-button" onclick="alert('You deserve kindness 💖')">❌ No</button>
+      </div>
+      <p id="bathMsg" class="thankMsg">Thanks for your kindness today!</p>
+    </div>
+  
+    <div class="torn-paper-divider"></div>
+  
+    <div class="section" id="badgeWall">
+      <h3>🏅 My Badges</h3>
+      <div id="badgeContainer"></div>
+    </div>
+  </div>
+  
+  <div class="torn-paper-divider"></div>
+  <br><br><br>
+  
+  <button onclick="resetPet()">🔄 Reset Pet</button>
+  
+  <footer class="bottom-nav">
+    <a href="index.html" class="nav-icon">🏠<span>Home</span></a>
+    <a href="toolkit-hub.html" class="nav-icon">🧰<span>Toolkit</span></a>
+    <a href="wellness.html" class="nav-icon">💖<span>Wellness</span></a>
+    <a href="pet.html" class="nav-icon">🐾<span>Pet</span></a>
+    <a href="important-numbers.html" class="nav-icon">🆘<span>Help</span></a>
+  </footer>
+  
+  <script type="module">
+    import { auth, db } from "./firebase-init.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc, getDoc, setDoc, onSnapshot, deleteDoc,
+      collection, serverTimestamp, increment, runTransaction
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // --- fast reveal + theme ---
+    const reveal = () => (document.documentElement.style.visibility = "visible");
+    const safety = setTimeout(reveal, 2000);
+    function applyThemeClass(themeClass) {
+      const root = document.documentElement;
+      const next = themeClass || "theme-original";
+      const keep = (root.className || "")
+        .split(/\s+/).filter(Boolean).filter(c => !c.startsWith("theme-"));
+      const curr = (root.className.match(/\btheme-[^\s]+/g) || [])[0];
+      if (curr === next) return;
+      root.className = [...keep, next].join(" ");
+    }
+
+      // ✅ INSERT sparkle function here
+      function createFullPageSparkles(count = 100) {
+        const container = document.getElementById('sparkleWrapper');
+        if (!container) return;
+        for (let i = 0; i < count; i++) {
+          const s = document.createElement('div');
+          s.className = 'sparkle';
+          s.style.top = `${Math.random() * 100}vh`;
+          s.style.left = `${Math.random() * 100}vw`;
+          s.style.animationDelay = `${Math.random() * 3}s`;
+          s.style.animationDuration = `${2 + Math.random() * 2.5}s`;
+          container.appendChild(s);
+        }
+      }
+
+    // --- utils + DOM ---
+    const esc = (s = "") => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    const ymdLocal = (d = new Date()) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+    const img = document.getElementById("petImage");
+    const stageEl = document.getElementById("petStage");
+    const feedsEl = document.getElementById("feedCount");
+    const badgesBox = document.getElementById("badgeContainer");
+
+    const feedBtn = document.getElementById("feedPetBtn");
+    const feedMsg = document.getElementById("feedMsg");
+    const waterYes = document.getElementById("waterYesBtn");
+    const waterNo = document.getElementById("waterNoBtn");
+    const waterMsg = document.getElementById("waterMsg");
+    const bathYes = document.getElementById("bathYesBtn");
+    const bathNo = document.getElementById("bathNoBtn");
+    const bathMsg = document.getElementById("bathMsg");
+    const petMessage = document.getElementById("petMessage");
+
+    function stageFromStreak(n = 0) {
+      if (n >= 90) return { file: "pet-adult.png", label: "Adult" };
+      if (n >= 30) return { file: "pet-teen.png", label: "Teen" };
+      if (n >= 7) return { file: "pet-child.png", label: "Child" };
+      return { file: "pet-baby.png", label: "Baby" };
+    }
+
+    // --- firestore helpers ---
+    let uid = null;
+    const petRef = () => doc(db, "users", uid, "pet", "state");
+
+    async function ensureDoc(ref, defaults) {
+      const snap = await getDoc(ref);
+      if (!snap.exists()) await setDoc(ref, defaults, { merge: true });
+      return (await getDoc(ref)).data() || defaults;
+    }
+
+    async function ensureBadge(userId, key, label, emoji) {
+      const bRef = doc(db, "users", userId, "badges", key);
+      if (!(await getDoc(bRef)).exists()) {
+        await setDoc(bRef, { key, label, emoji, earnedAt: serverTimestamp() });
+      }
+    }
+    async function maybeAwardCareBadges(userId, streak) {
+        // Day counts are approximate: 7, 30, 90, 180
+        if (streak >= 1) await ensureBadge(userId, "pawprint", "First Pet Care", "🐾");
+        if (streak >= 7) await ensureBadge(userId, "flower", "1 Week", "🌸");
+        if (streak >= 30) await ensureBadge(userId, "gem", "1 Month", "💎");
+        if (streak >= 90) await ensureBadge(userId, "crown", "3 Months", "👑");
+        if (streak >= 180) await ensureBadge(userId, "halfyear", "6 Months", "🏆"); // NEW
+      }
+
+    // reset "today" flags once per local day
+    async function rolloverDailyIfNeeded() {
+      const ref = petRef();
+      const today = ymdLocal();
+      await runTransaction(db, async (tx) => {
+        const snap = await tx.get(ref);
+        const d = snap.exists() ? snap.data() : {};
+        if (d.lastDailyYMD === today) return;
+        tx.set(ref, {
+          lastDailyYMD: today,
+          fedToday: false,
+          wateredToday: false,
+          bathedToday: false
+        }, { merge: true });
+      });
+    }
+
+    // --- actions ---
+    async function advanceIfComplete() {
+      const ref = petRef();
+      const d = (await getDoc(ref)).data() || {};
+      const today = ymdLocal();
+
+      const fed = (d.lastFedYMD || "") === today;
+      const water = !!d.wateredToday && d.lastDailyYMD === today;
+      const bath = !!d.bathedToday && d.lastDailyYMD === today;
+
+      if (fed && water && bath && (d.lastAdvanceYMD || "") !== today) {
+        const newStreak = (d.careStreak || 0) + 1;
+        const newLevel = (d.petLevel || 0) + 1;
+        await setDoc(ref, { careStreak: newStreak, petLevel: newLevel, lastAdvanceYMD: today }, { merge: true });
+        petMessage && (petMessage.textContent = "Great job! Your pet grew today 🌱");
+        await maybeAwardCareBadges(uid, newStreak);
+      }
+    }
+
+    let feedBusy = false;
+    async function feedPet() {
+      if (!uid || feedBusy) return;
+      feedBusy = true;
+      feedBtn?.setAttribute("disabled", "disabled");
+
+      await rolloverDailyIfNeeded();
+      const ref = petRef();
+      const today = ymdLocal();
+
+      try {
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(ref);
+          const d = snap.exists() ? snap.data() : {};
+          const canFeed = (d.canFeedYMD || "") === today;
+          const already = (d.lastFedYMD || "") === today;
+
+          if (!canFeed) throw new Error("not-allowed");
+          if (already) throw new Error("already-fed");
+
+          // consume token + mark fed
+          tx.set(ref, {
+            fedToday: true,
+            lastFed: serverTimestamp(),
+            lastFedYMD: today,
+            feedCount: increment(1),
+            canFeedYMD: ""                // consume today's token
+          }, { merge: true });
+        });
+
+        petMessage && (petMessage.textContent = "Yum! Thank you for feeding me! 🍽️");
+        feedMsg && (feedMsg.style.display = "block");
+        await advanceIfComplete();
+      } catch (e) {
+        if (e.message === "not-allowed") {
+          petMessage && (petMessage.textContent = "Please journal first to feed your pet. 📔");
+        } else if (e.message === "already-fed") {
+          petMessage && (petMessage.textContent = "Already fed today 🐾");
+        } else {
+          console.error("[pet] feed error:", e);
+          petMessage && (petMessage.textContent = "Hmm, couldn't feed right now.");
+        }
+      } finally {
+        feedBusy = false;
+      }
+    }
+
+    async function waterPet() {
+      if (!uid) return;
+      await rolloverDailyIfNeeded();
+      const ref = petRef();
+      const d = await ensureDoc(ref, {});
+      const today = ymdLocal();
+      if (d.wateredToday && d.lastDailyYMD === today) { // already done today
+        waterMsg && (waterMsg.style.display = "block");
+        waterYes && (waterYes.disabled = true);
+        waterNo && (waterNo.disabled = true);
+        return;
+      }
+      await setDoc(ref, { wateredToday: true, lastWatered: serverTimestamp() }, { merge: true });
+      petMessage && (petMessage.textContent = "So refreshing! Thank you for the water! 💧");
+      waterYes && (waterYes.disabled = true);
+      waterNo && (waterNo.disabled = true);
+      waterMsg && (waterMsg.style.display = "block");
+      await advanceIfComplete();
+    }
+
+    async function bathePet() {
+      if (!uid) return;
+      await rolloverDailyIfNeeded();
+      const ref = petRef();
+      const d = await ensureDoc(ref, {});
+      const today = ymdLocal();
+      if (d.bathedToday && d.lastDailyYMD === today) {
+        bathMsg && (bathMsg.style.display = "block");
+        bathYes && (bathYes.disabled = true);
+        bathNo && (bathNo.disabled = true);
+        return;
+      }
+      await setDoc(ref, { bathedToday: true, lastBathed: serverTimestamp() }, { merge: true });
+      petMessage && (petMessage.textContent = "All clean and sparkly now! 🧽");
+      bathYes && (bathYes.disabled = true);
+      bathNo && (bathNo.disabled = true);
+      bathMsg && (bathMsg.style.display = "block");
+      await advanceIfComplete();
+    }
+
+    async function resetPet() {
+      if (!uid) return;
+      if (!confirm("Reset your pet and pet-care badges? (Journal badges stay)")) return;
+
+      await setDoc(petRef(), {
+        feedCount: 0, careStreak: 0, petLevel: 0,
+        fedToday: false, wateredToday: false, bathedToday: false,
+        lastAdvanceYMD: "", canFeedYMD: "", lastDailyYMD: "", lastFedYMD: ""
+      }, { merge: true });
+
+      for (const id of ["pawprint", "flower", "gem", "crown"]) {
+        try { await deleteDoc(doc(db, "users", uid, "badges", id)); } catch { }
+      }
+    }
+
+    // expose for inline onclicks you already have
+    window.feedPet = feedPet;
+    window.waterPet = waterPet;
+    window.bathePet = bathePet;
+    window.resetPet = resetPet;
+
+    // --- auth + live UI wiring ---
+    let unsubTheme = null, unsubPet = null, unsubBadges = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      unsubTheme?.(); unsubPet?.(); unsubBadges?.();
+      unsubTheme = unsubPet = unsubBadges = null;
+
+      if (!user) { location.replace("login.html?next=pet.html"); return; }
+      uid = user.uid;
+
+      // theme
+      let first = true;
+      unsubTheme = onSnapshot(
+        doc(db, "users", uid),
+        (snap) => {
+          const t = snap.exists() ? (snap.data().themeClass || "theme-original") : "theme-original";
+          applyThemeClass(t);
+          if (first) {
+            reveal();
+            clearTimeout(safety);
+            first = false;
+
+            // ✅ seed sparkles once (avoid duplicates if you re-enter the page)
+            const wrap = document.getElementById('sparkleWrapper');
+            if (wrap && wrap.children.length === 0) {
+              // wait a tick so layout is ready
+              requestAnimationFrame(() => createFullPageSparkles(140));
+            }
+          }
+        },
+        (err) => {
+          console.error("[pet] theme", err);
+          applyThemeClass("theme-original");
+          reveal();
+          clearTimeout(safety);
+          // still seed sparkles on error path once
+          const wrap = document.getElementById('sparkleWrapper');
+          if (wrap && wrap.children.length === 0) {
+            requestAnimationFrame(() => createFullPageSparkles(140));
+          }
+        }
+      );
+
+      // ensure base doc + daily reset
+      await ensureDoc(petRef(), {
+        feedCount: 0, careStreak: 0, petLevel: 0,
+        fedToday: false, wateredToday: false, bathedToday: false,
+        lastAdvanceYMD: "", canFeedYMD: "", lastDailyYMD: "", lastFedYMD: ""
+      });
+      await rolloverDailyIfNeeded();
+
+      // live state to drive UI (this keeps buttons/messages correct on return)
+      unsubPet = onSnapshot(petRef(), (snap) => {
+        const d = snap.data() || {};
+        const st = stageFromStreak(d.careStreak || 0);
+
+        if (img) {
+          img.src = st.file;
+          img.style.maxWidth = "240px";
+          img.style.width = "100%";
+          img.style.borderRadius = "18px";
+          img.style.display = "block";
+          img.style.margin = "0 auto";
+        }
+        stageEl && (stageEl.textContent = st.label);
+        feedsEl && (feedsEl.textContent = d.feedCount || 0);
+
+        const today = ymdLocal();
+        const tokenIsToday = (d.canFeedYMD || "") === today;
+        const fedLocked = (d.lastFedYMD || "") === today;
+        feedBtn && (feedBtn.disabled = fedLocked || !tokenIsToday);
+        feedMsg && (feedMsg.style.display = fedLocked ? "block" : "none");
+
+        const didWater = !!d.wateredToday && d.lastDailyYMD === today;
+        const didBath = !!d.bathedToday && d.lastDailyYMD === today;
+
+        // enforce disabled/thanks visibility from live state
+        waterYes && (waterYes.disabled = didWater);
+        waterNo && (waterNo.disabled = didWater);
+        waterMsg && (waterMsg.style.display = didWater ? "block" : "none");
+
+        bathYes && (bathYes.disabled = didBath);
+        bathNo && (bathNo.disabled = didBath);
+        bathMsg && (bathMsg.style.display = didBath ? "block" : "none");
+      });
+
+      // just bind feed (your water/bath buttons already call the functions inline)
+      feedBtn?.addEventListener("click", feedPet);
+
+      // badges (prettier wall)
+      const KNOWN = [
+        { id: "firstJournal", label: "First Journal", emoji: "📝", hue: 300 },
+        { id: "pawprint", label: "First Pet Care", emoji: "🐾", hue: 120 },
+        { id: "flower", label: "1 Week", emoji: "🌸", hue: 330 },
+        { id: "gem", label: "1 Month", emoji: "💎", hue: 200 },
+        { id: "crown", label: "3 Months", emoji: "👑", hue: 45 },
+        { id: "halfyear", label: "6 Months", emoji: "🏆", hue: 15 } // NEW
+      ];
+
+      unsubBadges = onSnapshot(collection(db, "users", uid, "badges"), (snapshot) => {
+        if (!badgesBox) return;
+
+        const earned = new Set();
+        snapshot.forEach(b => earned.add(b.id));
+
+        // 3 columns, so with 6 KNOWN items you get 2 rows
+        let html = `<div style="
+      display:grid;
+      grid-template-columns:repeat(3,minmax(86px,1fr));
+      gap:16px;justify-items:center;align-items:start;
+    ">`;
+
+        for (const b of KNOWN) {
+          const has = earned.has(b.id);
+          const hue = b.hue;
+          const circleBg = has
+            ? `linear-gradient(135deg,hsl(${hue} 70% 60%),hsl(${hue} 70% 45%))`
+            : `linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.03))`;
+          const ring = has ? `0 0 0 3px rgba(255,255,255,.35) inset, 0 8px 18px rgba(0,0,0,.25)` : `0 0 0 2px rgba(255,255,255,.25) inset`;
+          const labelColor = has ? `#ffffff` : `rgba(255,255,255,.7)`;
+          const lockStyles = has ? "" : "opacity:.35;filter:grayscale(1);";
+
+          html += `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+        <div title="${esc(b.label)}"
+             style="width:94px;height:94px;border-radius:22px;display:flex;align-items:center;justify-content:center;
+                    background:${circleBg};box-shadow:${ring};font-size:38px;${lockStyles}">
+          ${b.emoji}
+        </div>
+        <small style="color:${labelColor};opacity:.95;text-align:center;font-size:.8rem;max-width:98px;line-height:1.1;">
+          ${esc(b.label)}
+        </small>
+      </div>`;
+        }
+
+        html += `</div>`;
+        badgesBox.innerHTML = html;
+      });
+   
+    });
+
+    window.setJournalClicked = () => { };
+
+  </script>
+
+</body>
+
+</html>

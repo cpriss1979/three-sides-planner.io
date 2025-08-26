@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Share to 3-Sides</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        body {
+            font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            padding: 1rem;
+            margin: 0
+        }
+
+        .ok {
+            padding: .75rem 1rem;
+            border: 1px solid rgba(0, 0, 0, .15);
+            border-radius: 12px;
+            background: #f7f7ff;
+            max-width: 700px
+        }
+    </style>
+</head>
+
+<body>
+    <p class="ok">Adding shared content…</p>
+    <script>
+        const base = location.pathname.startsWith('/three-sides-planner.io/') ? '/three-sides-planner.io/' : '/';
+        const go = (path) => location.replace(base + path);
+
+        // We declared method: "GET" in the manifest; read ?title=&text=&url=
+        const q = new URLSearchParams(location.search);
+        const payload = {
+            title: q.get('title') || '',
+            text: q.get('text') || '',
+            url: q.get('url') || ''
+        };
+
+        try {
+            const key = `inbox:share:${Date.now()}`;
+            localStorage.setItem(key, JSON.stringify(payload));
+        } catch { }
+
+        // Redirect into your journal page to import/use it
+        go('journal.html?from=share');
+    </script>
+</body>
+
+</html>
